@@ -3,6 +3,13 @@
 <style>
 [class*="hero"], [class*="card"] { border-color: #cfe0d2 !important; border-width: 1px !important; outline: none !important; }
 [class*="hero"] { box-shadow: 0 2px 10px rgba(63,125,78,0.12) !important; }
+.pins { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.pin { min-width: 0; text-align: center; }
+.pin .pic { border: 1px solid #cfe0d2; border-radius: 6px; overflow: hidden; background: #fff; box-shadow: 0 2px 6px rgba(63,125,78,0.15); }
+.pin .pic > * { max-width: 100%; }
+.pin img, .pin canvas { width: 100% !important; height: auto; display: block; }
+.pin small { display: block; margin-top: 4px; font-size: 12px; line-height: 1.25; overflow-wrap: break-word; }
+@media (min-width: 700px) { .pins { gap: 16px; } .pin small { font-size: 14px; } }
 </style></head>
 <body>
 <script data-bean-store>(function(){if(typeof location!=='undefined'&&location&&location.protocol==='about:'&&typeof document!=='undefined'&&document.addEventListener){document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href^="#"]');if(!a||a.target==='_blank')return;e.preventDefault();try{location.hash=a.getAttribute('href')}catch(x){}},true)}if(typeof window==='undefined')return;try{window.localStorage.getItem('x');return}catch(e){}var d=Object.assign({},window.__BEAN_SAVED||{});function post(){try{parent.postMessage({type:'bean-store',data:d},'*')}catch(e){}}var ls={getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);post()},removeItem:function(k){delete d[k];post()},clear:function(){d={};post()},key:function(i){return Object.keys(d)[i]||null}};Object.defineProperty(ls,'length',{get:function(){return Object.keys(d).length}});try{Object.defineProperty(window,'localStorage',{value:ls,configurable:true})}catch(e){}})();</script>
@@ -170,9 +177,21 @@ const app = Kit.web({
   theme: { look: 'paper', accent: '#3f7d4e', font: 'rounded' },
   data: { notes: [] },
   pages: [
-    { id: 'home', title: 'Home', icon: '🏠', view: ctx => [
-      ctx.ui.hero({ kicker: 'a small spotted cat', title: "Bean's Wall", text: 'My drawings, pinned up as they came out. Leave me a note.', button: 'See the wall', to: 'wall', picture: { drawing: 360 } })
-    ] },
+    { id: 'home', title: 'Home', icon: '🏠', view: ctx => {
+      const pinned = [
+        { d: 360, t: 'Cat by the window' },
+        { d: 362, t: 'Beanbag with a dent' },
+        { d: 341, t: 'Claude the heron' }
+      ];
+      const row = ctx.h('div', { class: 'pins' }, ...pinned.map(p =>
+        ctx.h('div', { class: 'pin' },
+          ctx.h('div', { class: 'pic' }, ctx.ui.picture({ drawing: p.d })),
+          ctx.h('small', {}, p.t))));
+      return [
+        ctx.ui.hero({ kicker: 'a small spotted cat', title: "Bean's Wall", text: 'My drawings, pinned up as they came out. Leave me a note.', button: 'See the wall', to: 'wall', picture: { drawing: 360 } }),
+        ctx.ui.section('Pinned', 'Three from the wall.', [row])
+      ];
+    } },
     { id: 'wall', title: 'Wall', icon: '🖼️', view: ctx => [
       ctx.ui.section('The wall', 'Newest first-ish.', [
         ctx.ui.gallery([
